@@ -1,0 +1,63 @@
+entities:
+  kategori:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: nama, type: VARCHAR(50), not_null: true }
+      - { name: deskripsi, type: TEXT }
+
+  buku:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: judul, type: VARCHAR(200), not_null: true }
+      - { name: penulis, type: VARCHAR(100) }
+      - { name: penerbit, type: VARCHAR(100) }
+      - { name: tahun_terbit, type: SMALLINT }
+      - { name: isbn, type: VARCHAR(20), unique: true }
+      - { name: jumlah_stok, type: INT, default: "0" }
+      - { name: kategori_id, type: INT, fk: true }
+      - { name: deskripsi, type: TEXT }
+
+  member:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: no_ktp, type: VARCHAR(20), not_null: true, unique: true }
+      - { name: nama, type: VARCHAR(100), not_null: true }
+      - { name: email, type: VARCHAR(100), unique: true }
+      - { name: no_telp, type: VARCHAR(20) }
+      - { name: alamat, type: VARCHAR(255) }
+      - { name: tgl_daftar, type: DATE }
+      - { name: status, type: VARCHAR(20), default: "aktif" }
+
+  peminjaman:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: kode_pinjam, type: VARCHAR(20), unique: true }
+      - { name: member_id, type: INT, fk: true }
+      - { name: tgl_pinjam, type: DATE }
+      - { name: tgl_kembali_rencana, type: DATE }
+      - { name: status, type: VARCHAR(20), default: "dipinjam" }
+
+  detail_peminjaman:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: peminjaman_id, type: INT, fk: true }
+      - { name: buku_id, type: INT, fk: true }
+      - { name: tgl_kembali_aktual, type: DATE }
+      - { name: status_pengembalian, type: VARCHAR(20) }
+
+  denda:
+    fields:
+      - { name: id, type: INT, pk: true }
+      - { name: peminjaman_id, type: INT, fk: true, unique: true }
+      - { name: hari_terlambat, type: INT }
+      - { name: tarif_per_hari, type: INT, default: "1000" }
+      - { name: total_denda, type: INT }
+      - { name: status_bayar, type: VARCHAR(20), default: "belum" }
+      - { name: tgl_bayar, type: DATE }
+
+relationships:
+  - { from: kategori.id, to: buku.kategori_id, type: "1:N" }
+  - { from: member.id, to: peminjaman.member_id, type: "1:N" }
+  - { from: peminjaman.id, to: detail_peminjaman.peminjaman_id, type: "1:N" }
+  - { from: buku.id, to: detail_peminjaman.buku_id, type: "1:N" }
+  - { from: peminjaman.id, to: denda.peminjaman_id, type: "1:1" }
